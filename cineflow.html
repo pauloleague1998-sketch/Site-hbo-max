@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CineFlow — Filmes, séries e muito mais em um só lugar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: #0F0F1A;
+    --bg-1: #1A1A2E;
+    --bg-2: #2D1B4E;
+    --text-0: #FFFFFF;
+    --text-1: #E0E0E8;
+    --text-2: #A0A0B0;
+    --purple: #7B2CBF;
+    --magenta: #B5179E;
+    --lavender: #9D4EDD;
+    --error: #FF4D6D;
+    --success: #00FF88;
+    --border-idle: #3A3A4A;
+    --radius: 12px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-0);
+    color: var(--text-1);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* ===== Animações de entrada ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .anim {
+    animation: slideUp 0.6s var(--ease) both;
+  }
+  .anim-fade {
+    animation: fadeIn 0.6s var(--ease) both;
+  }
+
+  /* ===== Navegação ===== */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: linear-gradient(to bottom, rgba(15,15,26,0.9), rgba(15,15,26,0));
+    padding: 22px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--purple), var(--magenta));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    position: relative;
+    color: var(--text-1);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    padding: 4px 0;
+    cursor: pointer;
+  }
+  /* Sublinhado animado (cresce da esquerda para a direita) */
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -3px;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--magenta));
+    border-radius: 2px;
+    transition: width 0.3s var(--ease);
+  }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a:hover { color: var(--text-0); }
+
+  .nav-login {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    padding: 9px 22px;
+  }
+  .nav-login:hover {
+    background: rgba(123,44,191,0.18);
+    border-color: var(--purple);
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 5% 80px;
+    background: linear-gradient(160deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-2) 100%);
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: url("https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=dark%20cinematic%20movie%20theater%20atmosphere%2C%20purple%20and%20magenta%20ambient%20glow%2C%20film%20projector%20light%20beams%2C%20dramatic%20moody%20lighting&image_size=landscape_16_9")
+      center / cover no-repeat;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(15,15,26,0.85) 100%);
+    pointer-events: none;
+  }
+
+  .hero > * { position: relative; z-index: 1; }
+
+  /* Título principal — ponto focal máximo */
+  .hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.2rem, 6vw, 3.75rem); /* 52-60px em desktop */
+    line-height: 1.08;
+    color: var(--text-0);
+    max-width: 15ch;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+
+  .hero-subtitle {
+    margin-top: 18px;
+    max-width: 52ch;
+    font-weight: 400;
+    color: var(--text-2);
+    font-size: clamp(1rem, 2vw, 1.15rem);
+  }
+
+  /* Prova social — agrupada (gap reduzido, unidade coesa) */
+  .social-proof {
+    margin-top: 26px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .social-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(123,44,191,0.25);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: var(--text-1);
+  }
+  .social-item svg { color: var(--purple); flex-shrink: 0; }
+
+  /* Formulário — ponto focal secundário (margem ampliada p/ separar da promessa) */
+  .form-wrap { margin-top: 64px; width: 100%; max-width: 560px; }
+  .form {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .input-wrap { flex: 1; position: relative; }
+  .input-wrap input {
+    width: 100%;
+    height: 60px;
+    background: rgba(26,26,46,0.8);
+    border: 1.5px solid var(--border-idle);
+    border-radius: var(--radius);
+    color: var(--text-0);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    padding: 0 20px;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    backdrop-filter: blur(8px);
+  }
+  .input-wrap input::placeholder { color: #6b6b80; }
+  .input-wrap input:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(123,44,191,0.25);
+  }
+  .input-wrap input.input-error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(255,77,109,0.18);
+  }
+
+  /* Botão CTA — visualmente dominante */
+  .cta {
+    position: relative;
+    height: 60px;
+    padding: 0 36px;
+    border: none;
+    border-radius: var(--radius);
+    background: linear-gradient(90deg, var(--purple), var(--magenta));
+    color: var(--text-0);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(123,44,191,0.4);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s, background 0.25s;
+  }
+  .cta:hover {
+    background: linear-gradient(90deg, var(--purple), var(--magenta));
+    box-shadow: 0 0 24px rgba(123,44,191,0.7);
+    transform: scale(1.03);
+  }
+  .cta:active { transform: scale(0.99); }
+
+  /* Estado de carregamento */
+  .cta.loading {
+    background: var(--purple);
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  .cta.loading:hover { box-shadow: none; transform: none; }
+
+  .spinner {
+    width: 22px; height: 22px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .badge {
+    display: inline-block;
+    margin-top: 16px;
+    background: var(--magenta);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(181,23,158,0.4);
+  }
+
+  /* Feedback da máquina de estados */
+  .feedback {
+    margin-top: 14px;
+    min-height: 26px;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .feedback.error { color: var(--error); }
+  .feedback.success { color: var(--success); }
+
+  /* ===== Seção de filmes ===== */
+  .featured {
+    padding: 70px 5% 90px;
+    position: relative;
+    background: linear-gradient(180deg, var(--bg-0), #12121f);
+  }
+  .featured h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    color: var(--text-0);
+    margin-bottom: 34px;
+    text-align: center;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s, border-color 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-8px);
+    border-color: var(--magenta);
+    box-shadow: 0 18px 40px rgba(123,44,191,0.35);
+  }
+  .card img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+  }
+  /* Overlay gradiente roxo semi-transparente + play */
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(123,44,191,0.85), rgba(45,27,78,0.5));
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card:hover .card-overlay { opacity: 0.7; }
+  .play {
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--magenta);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    transform: scale(0.8);
+    transition: transform 0.3s var(--ease);
+  }
+  .card:hover .play { transform: scale(1); }
+  .card-title {
+    padding: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-0);
+  }
+
+  footer {
+    padding: 40px 5%;
+    text-align: center;
+    color: var(--text-2);
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ===== Responsivo ===== */
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .form { flex-direction: column; }
+    .cta { width: 100%; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Barra de navegação -->
+  <nav class="nav anim-fade">
+    <a href="#" class="logo">CineFlow</a>
+    <ul class="nav-links">
+      <li><a href="#">Início</a></li>
+      <li><a href="#planos">Planos</a></li>
+      <li><a href="#filmes">Filmes</a></li>
+      <li><a href="#series">Séries</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#login" class="nav-login">Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+
+    <h1 class="hero-title anim">Filmes, séries e muito mais em um só lugar</h1>
+    <p class="hero-subtitle anim" style="animation-delay:.1s">
+      Assista quando e onde quiser, sem comerciais, com estreias exclusivas e um catálogo que não para de crescer.
+    </p>
+
+    <!-- Prova social agrupada -->
+    <div class="social-proof anim" style="animation-delay:.18s">
+      <span class="social-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+        +40 mil títulos
+      </span>
+      <span class="social-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        Conteúdo exclusivo HBO
+      </span>
+      <span class="social-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Lançamentos do cinema
+      </span>
+    </div>
+
+    <!-- Formulário (máquina de estados) -->
+    <div class="form-wrap anim" style="animation-delay:.26s">
+      <form class="form" id="signup-form" novalidate>
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="email"
+            placeholder="Digite seu melhor email"
+            aria-label="Email"
+            autocomplete="email"
+          />
+        </div>
+        <button type="submit" class="cta" id="cta">
+          <span class="cta-text">Começar grátis</span>
+        </button>
+      </form>
+      <span class="badge">7 dias grátis</span>
+      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+    </div>
+  </header>
+
+  <!-- Filmes em destaque -->
+  <section class="featured" id="filmes">
+    <h2>Em destaque</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer>© 2026 CineFlow. Todos os direitos reservados.</footer>
+
+<script>
+  // ===== Dados dos filmes =====
+  const filmes = [
+    { titulo: "Horizonte de Eventos", prompt: "epic science fiction space movie poster, astronaut floating near a purple nebula, cinematic dramatic lighting" },
+    { titulo: "O Último Reino", prompt: "fantasy adventure movie poster, ancient castle on a floating island, dragon silhouette, purple stormy sky" },
+    { titulo: "Noite Neon", prompt: "noir crime thriller movie poster, detective in trench coat, neon magenta city lights, rain reflections" },
+    { titulo: "Entre Dois Mundos", prompt: "romantic drama movie poster, couple silhouette at sunset, warm purple and magenta tones" },
+    { titulo: "A Casa Sombria", prompt: "horror movie poster, dark haunted house, fog, moonlight, eerie purple glow" },
+    { titulo: "Império de Aço", prompt: "action movie poster, hero silhouette with explosion, magenta and purple flames, cinematic" },
+    { titulo: "Robô & Cia", prompt: "animated family movie poster, cute robot character, colorful magical world, purple sky" },
+    { titulo: "Aurora Selvagem", prompt: "nature documentary movie poster, majestic mountain landscape, purple northern lights" },
+  ];
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = filmes.map(f => `
+    <article class="card">
+      <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(f.prompt)}&image_size=portrait_4_3" alt="${f.titulo}" loading="lazy" />
+      <div class="card-overlay">
+        <div class="play">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </div>
+      </div>
+      <h3 class="card-title">${f.titulo}</h3>
+    </article>
+  `).join('');
+
+  // ===== Máquina de estados do formulário =====
+  // Estados: idle | loading | error | success
+  // Um único `status` garante que erro e sucesso NUNCA coexistam.
+  const form = document.getElementById('signup-form');
+  const emailInput = document.getElementById('email');
+  const cta = document.getElementById('cta');
+  const feedback = document.getElementById('feedback');
+
+  let status = 'idle';
+  let redirectTimer = null;
+
+  function setStatus(novo) {
+    status = novo;
+    render();
+  }
+
+  function render() {
+    // Reset do feedback visual
+    emailInput.classList.remove('input-error');
+    cta.classList.remove('loading');
+    feedback.className = 'feedback';
+    feedback.innerHTML = '';
+
+    switch (status) {
+      case 'idle':
+        cta.disabled = false;
+        cta.innerHTML = '<span class="cta-text">Começar grátis</span>';
+        break;
+
+      case 'loading':
+        cta.disabled = true;
+        cta.classList.add('loading');
+        cta.innerHTML = '<span class="spinner"></span><span class="cta-text">Criando sua conta...</span>';
+        break;
+
+      case 'error':
+        cta.disabled = false;
+        cta.innerHTML = '<span class="cta-text">Começar grátis</span>';
+        emailInput.classList.add('input-error');
+        feedback.classList.add('error');
+        feedback.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Digite um email válido para começar.
+        `;
+        break;
+
+      case 'success':
+        cta.disabled = false;
+        cta.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="cta-text" style="color:#00FF88">Conta criada</span>
+        `;
+        feedback.classList.add('success');
+        feedback.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Tudo pronto! Redirecionando para o catálogo...
+        `;
+        break;
+    }
+  }
+
+  const emailValido = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (status === 'loading') return;
+
+    const email = emailInput.value.trim();
+
+    // Validação → estado de erro
+    if (!emailValido(email)) {
+      setStatus('error');
+      return;
+    }
+
+    // Envio → estado de carregamento
+    setStatus('loading');
+
+    // Simula chamada assíncrona de cadastro
+    setTimeout(() => {
+      setStatus('success');
+
+      // Redirecionamento automático após 2s (scroll suave até o catálogo)
+      redirectTimer = setTimeout(() => {
+        document.getElementById('filmes').scrollIntoView({ behavior: 'smooth' });
+        // Volta ao estado inicial para permitir novo cadastro
+        setStatus('idle');
+      }, 2000);
+    }, 1500);
+  });
+
+  // Ao digitar novamente, sai do erro (feedback imediato de correção)
+  emailInput.addEventListener('input', () => {
+    if (status === 'error') setStatus('idle');
+  });
+
+  render();
+</script>
+</body>
+</html>

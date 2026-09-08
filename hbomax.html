@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HBO Max — Tudo o que você ama em um só lugar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     DESIGN SYSTEM — HBO Max
+     Paleta oficial + tokens de espaçamento/raio/transição
+  ============================================================ */
+  :root {
+    --bg-0: #0A0A0A;          /* fundo principal (preto quase absoluto) */
+    --bg-1: #1A1A1A;          /* fundo secundário (cinza muito escuro) */
+    --purple: #6B2CF5;        /* roxo HBO */
+    --magenta: #D400D4;       /* magenta intenso */
+    --text-0: #FFFFFF;        /* texto principal */
+    --text-1: #B3B3B3;        /* texto secundário */
+    --border: #2A2A2A;        /* bordas */
+    --error: #FF3366;         /* estado de erro */
+    --success: #00FF88;       /* estado de sucesso */
+
+    --gradient: linear-gradient(90deg, #6B2CF5, #D400D4);
+    --gradient-invert: linear-gradient(90deg, #D400D4, #6B2CF5);
+
+    --radius-btn: 50px;       /* botões totalmente arredondados */
+    --radius-card: 8px;       /* cards */
+    --ease: 0.3s ease-in-out; /* transição padrão */
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg-0);
+    color: var(--text-0);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  img { display: block; max-width: 100%; }
+
+  /* ===== Animações de entrada ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .anim { animation: slideUp 0.7s var(--ease) both; }
+  .anim-fade { animation: fadeIn 0.7s var(--ease) both; }
+
+  /* Revelação ao rolar (IntersectionObserver adiciona .revealed) */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+  .reveal.revealed { opacity: 1; transform: translateY(0); }
+
+  /* ============================================================
+     NAVBAR
+  ============================================================ */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.9), rgba(10,10,10,0));
+    transition: background var(--ease), padding var(--ease);
+  }
+  .nav.scrolled {
+    background: rgba(10,10,10,0.96);
+    padding: 14px 5%;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Logo "HBO" branco + "MAX" em gradiente */
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .logo-hbo { color: var(--text-0); }
+  .logo-max {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-left: 2px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    list-style: none;
+  }
+  .nav-links a {
+    position: relative;
+    color: var(--text-0);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 4px 0;
+    cursor: pointer;
+    transition: color var(--ease);
+  }
+  .nav-links a:hover { color: var(--text-0); }
+  /* Sublinhado animado que cresce da esquerda */
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0; height: 2px;
+    background: var(--purple);
+    border-radius: 2px;
+    transition: width var(--ease);
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-actions { display: flex; align-items: center; gap: 14px; }
+  .nav-login {
+    color: var(--text-0);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 8px 18px;
+    transition: color var(--ease);
+  }
+  .nav-login:hover { color: var(--text-1); }
+
+  /* Botão "Assine" — gradiente + 50px */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: none;
+    border-radius: var(--radius-btn);
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: filter var(--ease), transform var(--ease), background var(--ease), opacity var(--ease);
+    white-space: nowrap;
+  }
+  .btn-gradient {
+    background: var(--gradient);
+    color: var(--text-0);
+    padding: 12px 28px;
+    font-size: 0.9rem;
+  }
+  .btn-gradient:hover {
+    background: var(--gradient-invert);
+    filter: brightness(1.1);
+  }
+
+  /* Botão hambúrguer (mobile) */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+  }
+  .hamburger span {
+    width: 24px; height: 2px;
+    background: var(--text-0);
+    border-radius: 2px;
+    transition: transform var(--ease), opacity var(--ease);
+  }
+  .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.active span:nth-child(2) { opacity: 0; }
+  .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ============================================================
+     HERO — destaque em tela cheia
+  ============================================================ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 5% 90px;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      url("https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=epic%20fantasy%20tv%20series%20key%20art%2C%20massive%20dragon%20silhouette%20over%20dark%20medieval%20castle%2C%20purple%20and%20magenta%20fire%20glow%2C%20cinematic%20dramatic%20lighting&image_size=landscape_16_9")
+      center / cover no-repeat;
+  }
+  /* Overlay gradiente preto 70% para manter contraste */
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.7) 60%, var(--bg-0) 100%);
+  }
+  .hero > * { position: relative; z-index: 1; }
+
+  .hero-eyebrow {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-1);
+    margin-bottom: 22px;
+  }
+  /* "Logo" da obra em destaque */
+  .hero-logo {
+    font-weight: 900;
+    font-size: clamp(3rem, 9vw, 7rem);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #FFFFFF 30%, #B3B3B3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 6px 40px rgba(107,44,245,0.55);
+    max-width: 14ch;
+  }
+  .hero-sub {
+    margin-top: 18px;
+    font-weight: 400;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-1);
+    max-width: 50ch;
+  }
+  .hero-ctas {
+    margin-top: 34px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-large { padding: 16px 48px; font-size: 18px; }
+  .btn-outline {
+    background: transparent;
+    color: var(--text-0);
+    border: 2px solid var(--text-0);
+    padding: 14px 46px;
+    font-size: 18px;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+  /* ============================================================
+     SEÇÃO DE CADASTRO (título + prova social + formulário)
+  ============================================================ */
+  .signup {
+    padding: 80px 5% 90px;
+    text-align: center;
+    background: radial-gradient(ellipse at top center, rgba(107,44,245,0.12), transparent 60%), var(--bg-0);
+  }
+  .signup-title {
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 48px);
+    line-height: 1.1;
+    max-width: 20ch;
+    margin: 0 auto;
+  }
+  .signup-subtitle {
+    margin-top: 16px;
+    font-weight: 400;
+    font-size: clamp(1.05rem, 2vw, 20px);
+    color: var(--text-1);
+  }
+
+  /* Prova social — Lei da Proximidade (gap 8px, bloco coeso) */
+  .social-proof {
+    margin-top: 26px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .social-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.9rem;
+    color: var(--text-1);
+    font-weight: 500;
+  }
+  .social-item .dot { color: var(--purple); font-weight: 700; }
+  .social-item svg { color: var(--purple); flex-shrink: 0; }
+
+  /* Formulário — input largo (400px) + botão ao lado */
+  .form-wrap { margin-top: 48px; width: 100%; max-width: 620px; margin-left: auto; margin-right: auto; }
+  .form {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    justify-content: center;
+  }
+  .input-wrap { flex: 1; max-width: 400px; position: relative; }
+  .input-wrap input {
+    width: 100%;
+    height: 58px;
+    background: var(--bg-1);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-btn);
+    color: var(--text-0);
+    font-family: inherit;
+    font-size: 16px;
+    padding: 0 24px;
+    outline: none;
+    transition: border-color var(--ease), box-shadow var(--ease);
+  }
+  .input-wrap input::placeholder { color: #6b6b6b; }
+  .input-wrap input:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(107,44,245,0.25);
+  }
+  .input-wrap input.input-error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(255,51,102,0.2);
+  }
+
+  .btn-submit {
+    height: 58px;
+    padding: 0 32px;
+    font-size: 16px;
+    background: var(--gradient);
+    color: var(--text-0);
+  }
+  .btn-submit:hover { background: var(--gradient-invert); filter: brightness(1.1); }
+  .btn-submit.loading { opacity: 0.5; cursor: not-allowed; }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  /* Feedback da máquina de estados */
+  .feedback {
+    margin-top: 16px;
+    min-height: 26px;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+  .feedback.error { color: var(--error); }
+  .feedback.success { color: var(--success); }
+
+  /* ============================================================
+     CARROSSÉIS DE CONTEÚDO
+  ============================================================ */
+  .carousel-section { padding: 24px 0 8px; }
+  .carousel-section h2 {
+    font-weight: 700;
+    font-size: 24px;
+    margin: 0 5% 18px;
+  }
+  .carousel { position: relative; padding: 0 5%; }
+
+  .carousel-track {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: 8px;
+    scrollbar-width: none; /* Firefox */
+  }
+  .carousel-track::-webkit-scrollbar { display: none; }
+
+  /* Setas de navegação */
+  .arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 48px; height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(26,26,26,0.85);
+    color: var(--text-0);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--ease), transform var(--ease);
+  }
+  .arrow:hover { background: var(--purple); }
+  .arrow.prev { left: 8px; }
+  .arrow.next { right: 8px; }
+
+  /* Card — proporção 2:3 */
+  .card {
+    position: relative;
+    flex: 0 0 auto;
+    width: 200px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-1);
+    border: 2px solid transparent;
+    transition: border-color var(--ease), transform var(--ease), box-shadow var(--ease);
+    scroll-snap-align: start;
+  }
+  .card:hover {
+    border-color: var(--purple);
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px rgba(107,44,245,0.35);
+  }
+  .card img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+  }
+  /* Overlay roxo transparente (60%) + play branco centralizado */
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(107,44,245,0.85), rgba(212,0,212,0.4));
+    opacity: 0;
+    transition: opacity var(--ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card:hover .card-overlay { opacity: 0.6; }
+  .play {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.8);
+    transition: transform var(--ease);
+  }
+  .card:hover .play { transform: scale(1); }
+
+  .card-title {
+    padding: 14px 14px 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Badges "4K" / "Dolby Atmos" */
+  .badges {
+    position: absolute;
+    top: 10px; left: 10px;
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+  }
+  .badge {
+    background: var(--purple);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* ============================================================
+     SEÇÃO DE PLANOS
+  ============================================================ */
+  .plans {
+    padding: 80px 5% 100px;
+    background: var(--bg-1);
+  }
+  .plans h2 {
+    font-weight: 700;
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .plans-sub {
+    text-align: center;
+    color: var(--text-1);
+    margin-bottom: 48px;
+  }
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1080px;
+    margin: 0 auto;
+    align-items: stretch;
+  }
+  .plan {
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 34px 28px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform var(--ease), border-color var(--ease), box-shadow var(--ease);
+  }
+  .plan:hover { transform: translateY(-6px); }
+  .plan.featured {
+    border: 2px solid var(--purple);
+    box-shadow: 0 0 40px rgba(107,44,245,0.25);
+  }
+  .plan-badge {
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--gradient);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 50px;
+    white-space: nowrap;
+  }
+  .plan-name { font-weight: 700; font-size: 1.2rem; }
+  .plan-price { margin-top: 14px; font-weight: 800; font-size: 2.2rem; }
+  .plan-price small { font-size: 1rem; color: var(--text-1); font-weight: 500; }
+  .plan-features {
+    list-style: none;
+    margin: 24px 0 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+  }
+  .plan-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: var(--text-1);
+    font-size: 0.92rem;
+  }
+  .plan-features svg { color: var(--purple); flex-shrink: 0; margin-top: 2px; }
+  .plan .btn { width: 100%; padding: 14px; font-size: 1rem; }
+
+  /* ============================================================
+     FOOTER
+  ============================================================ */
+  footer {
+    padding: 64px 5% 40px;
+    background: var(--bg-0);
+    border-top: 1px solid var(--border);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    max-width: 1080px;
+    margin: 0 auto 40px;
+  }
+  .footer-col h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-0);
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col a {
+    color: var(--text-1);
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: color var(--ease);
+  }
+  .footer-col a:hover { color: var(--text-0); }
+  .social-icons { display: flex; gap: 14px; }
+  .social-icons a {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-0);
+    transition: background var(--ease), border-color var(--ease);
+  }
+  .social-icons a:hover { background: var(--purple); border-color: var(--purple); }
+  .copyright {
+    text-align: center;
+    color: var(--text-1);
+    font-size: 0.78rem;
+    opacity: 0.7;
+  }
+
+  /* ============================================================
+     RESPONSIVIDADE
+  ============================================================ */
+  @media (max-width: 1024px) {
+    .plans-grid { grid-template-columns: 1fr; max-width: 480px; }
+    .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    .card { width: 160px; }
+  }
+
+  @media (max-width: 768px) {
+    /* Menu vira hambúrguer */
+    .nav-links, .nav-login { display: none; }
+    .hamburger { display: flex; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: rgba(10,10,10,0.98);
+      padding: 20px 5% 28px;
+      gap: 18px;
+      align-items: flex-start;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Formulário em coluna */
+    .form { flex-direction: column; }
+    .input-wrap { max-width: 100%; }
+    .btn-submit { width: 100%; }
+
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card { width: 140px; }
+    .arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="nav" id="nav">
+    <a href="#" class="logo">
+      <span class="logo-hbo">HBO</span><span class="logo-max">MAX</span>
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#inicio">Início</a></li>
+      <li><a href="#filmes">Filmes</a></li>
+      <li><a href="#series">Séries</a></li>
+      <li><a href="#esportes">Esportes</a></li>
+      <li><a href="#planos">Planos</a></li>
+      <li><a href="#" class="nav-login">Login</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a href="#planos" class="btn btn-gradient">Assine</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <header class="hero" id="inicio">
+    <div class="hero-bg"></div>
+
+    <p class="hero-eyebrow anim">Série Original HBO</p>
+    <h1 class="hero-logo anim" style="animation-delay:.08s">House of the Dragon</h1>
+    <p class="hero-sub anim" style="animation-delay:.16s">
+      A dança dos dragões começa. Uma nova temporada épica, repleta de poder, traição e fogo.
+    </p>
+    <div class="hero-ctas anim" style="animation-delay:.24s">
+      <a href="#" class="btn btn-gradient btn-large">Assistir Agora</a>
+      <a href="#" class="btn btn-outline">Saiba Mais</a>
+    </div>
+  </header>
+
+  <!-- ===================== CADASTRO ===================== -->
+  <section class="signup">
+    <h2 class="signup-title reveal">Tudo o que você ama em um só lugar</h2>
+    <p class="signup-subtitle reveal">Filmes, séries, esportes ao vivo e muito mais</p>
+
+    <!-- Prova social agrupada (gap 8px) -->
+    <div class="social-proof reveal">
+      <span class="social-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        7 dias grátis
+      </span>
+      <span class="social-item"><span class="dot">·</span></span>
+      <span class="social-item">Depois R$ 27,90/mês</span>
+      <span class="social-item"><span class="dot">·</span></span>
+      <span class="social-item">Cancele quando quiser</span>
+    </div>
+
+    <!-- Formulário (máquina de estados) -->
+    <div class="form-wrap reveal">
+      <form class="form" id="signup-form" novalidate>
+        <div class="input-wrap">
+          <input type="email" id="email" placeholder="Digite seu email" aria-label="Email" autocomplete="email" />
+        </div>
+        <button type="submit" class="btn btn-submit" id="cta">
+          <span class="cta-text">Começar teste grátis</span>
+        </button>
+      </form>
+      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ===================== CARROSSÉIS ===================== -->
+  <section class="carousel-section" id="series">
+    <h2 class="reveal">Originais HBO</h2>
+    <div class="carousel">
+      <button class="arrow prev" aria-label="Anterior">&#10094;</button>
+      <div class="carousel-track" id="track-series"></div>
+      <button class="arrow next" aria-label="Próximo">&#10095;</button>
+    </div>
+  </section>
+
+  <section class="carousel-section" id="filmes">
+    <h2 class="reveal">Filmes em Destaque</h2>
+    <div class="carousel">
+      <button class="arrow prev" aria-label="Anterior">&#10094;</button>
+      <div class="carousel-track" id="track-filmes"></div>
+      <button class="arrow next" aria-label="Próximo">&#10095;</button>
+    </div>
+  </section>
+
+  <!-- ===================== PLANOS ===================== -->
+  <section class="plans" id="planos">
+    <h2 class="reveal">Escolha seu plano</h2>
+    <p class="plans-sub reveal">Cancele quando quiser. Todos os planos incluem 7 dias grátis.</p>
+
+    <div class="plans-grid">
+      <!-- Com Anúncios -->
+      <article class="plan reveal">
+        <h3 class="plan-name">Com Anúncios</h3>
+        <div class="plan-price">R$ 27,90<small>/mês</small></div>
+        <ul class="plan-features">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Catálogo completo</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Full HD</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>2 telas simultâneas</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Com anúncios</li>
+        </ul>
+        <button class="btn btn-gradient">Assinar</button>
+      </article>
+
+      <!-- Sem Anúncios (destaque) -->
+      <article class="plan featured reveal">
+        <span class="plan-badge">Mais Popular</span>
+        <h3 class="plan-name">Sem Anúncios</h3>
+        <div class="plan-price">R$ 37,90<small>/mês</small></div>
+        <ul class="plan-features">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Catálogo completo</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Full HD</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>3 telas simultâneas</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Sem anúncios</li>
+        </ul>
+        <button class="btn btn-gradient">Assinar</button>
+      </article>
+
+      <!-- Premium 4K -->
+      <article class="plan reveal">
+        <h3 class="plan-name">Premium 4K</h3>
+        <div class="plan-price">R$ 49,90<small>/mês</small></div>
+        <ul class="plan-features">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Catálogo completo</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>4K + Dolby Atmos</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>5 telas simultâneas</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Sem anúncios</li>
+        </ul>
+        <button class="btn btn-gradient">Assinar</button>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Sobre</h4>
+        <ul>
+          <li><a href="#">A HBO Max</a></li>
+          <li><a href="#">Imprensa</a></li>
+          <li><a href="#">Carreiras</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Suporte</h4>
+        <ul>
+          <li><a href="#">Central de ajuda</a></li>
+          <li><a href="#">Dispositivos</a></li>
+          <li><a href="#">Fale conosco</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Termos de uso</a></li>
+          <li><a href="#">Privacidade</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Redes Sociais</h4>
+        <div class="social-icons">
+          <!-- Instagram -->
+          <a href="#" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>
+          </a>
+          <!-- Twitter / X -->
+          <a href="#" aria-label="Twitter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.3l-4.9-6.4L6.2 22H3l7.3-8.4L1 2h6.4l4.4 5.9L18.9 2z"/></svg>
+          </a>
+          <!-- YouTube -->
+          <a href="#" aria-label="YouTube">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.5s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.4-1C16.4 4 12 4 12 4s-4.4 0-7.7.2c-.5.1-1.5.1-2.4 1-.7.7-.9 2.3-.9 2.3S.8 9.4.8 11.3v1.4c0 1.9.2 3.8.2 3.8s.2 1.6.9 2.3c.9.9 2 .9 2.5 1 1.8.2 7.6.2 7.6.2s4.4 0 7.7-.3c.5-.1 1.5-.1 2.4-1 .7-.7.9-2.3.9-2.3s.2-1.9.2-3.8v-1.4c0-1.9-.2-3.7-.2-3.7zM9.8 15V9l6.2 3-6.2 3z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <p class="copyright">© 2026 HBO Max. Todos os direitos reservados.</p>
+  </footer>
+
+<script>
+  // ============================================================
+  // DADOS DOS CONTEÚDOS (título + prompt de imagem + badges)
+  // ============================================================
+  const IMG = 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image';
+
+  const series = [
+    { titulo: 'House of the Dragon', badges: ['4K', 'Dolby Atmos'], prompt: 'epic fantasy tv series poster, dragon over medieval castle, purple fire, cinematic' },
+    { titulo: 'The Last of Us', badges: ['4K'], prompt: 'post apocalyptic drama series poster, man and girl in overgrown ruined city, cinematic moody' },
+    { titulo: 'Succession', badges: [], prompt: 'corporate drama series poster, man in suit overlooking city skyline, dark cinematic' },
+    { titulo: 'Euphoria', badges: [], prompt: 'teen drama series poster, neon lights glitter aesthetic, moody portrait' },
+    { titulo: 'The White Lotus', badges: [], prompt: 'resort drama series poster, luxury tropical hotel, mysterious atmosphere' },
+    { titulo: 'True Detective', badges: ['4K'], prompt: 'noir crime series poster, detective silhouette on dark foggy road' },
+    { titulo: 'The Penguin', badges: [], prompt: 'gotham crime series poster, gangster silhouette in rainy city night' },
+    { titulo: 'Westworld', badges: ['4K', 'Dolby Atmos'], prompt: 'sci fi western series poster, futuristic desert landscape, dramatic' }
+  ];
+
+  const filmes = [
+    { titulo: 'Dune: Part Two', badges: ['4K', 'Dolby Atmos'], prompt: 'epic sci fi movie poster, desert planet, giant sandworm, dramatic' },
+    { titulo: 'The Batman', badges: ['4K'], prompt: 'dark superhero movie poster, bat silhouette in rain, gothic city' },
+    { titulo: 'Furiosa', badges: [], prompt: 'post apocalyptic action movie poster, warrior woman in desert wasteland' },
+    { titulo: 'Godzilla x Kong', badges: ['4K', 'Dolby Atmos'], prompt: 'monster action movie poster, giant monsters clashing, epic' },
+    { titulo: 'Wonka', badges: [], prompt: 'whimsical fantasy movie poster, chocolate factory, colorful magical' },
+    { titulo: 'Barbie', badges: [], prompt: 'vibrant comedy movie poster, pink retro aesthetic, playful' },
+    { titulo: 'Oppenheimer', badges: ['4K'], prompt: 'biographical drama movie poster, atomic explosion, dramatic' },
+    { titulo: 'Aquaman', badges: ['4K'], prompt: 'underwater superhero movie poster, ocean kingdom, epic' }
+  ];
+
+  // ============================================================
+  // RENDERIZAÇÃO DOS CARROSSÉIS
+  // ============================================================
+  function cardHTML(item) {
+    const badges = item.badges.length
+      ? `<div class="badges">${item.badges.map(b => `<span class="badge">${b}</span>`).join('')}</div>`
+      : '';
+    const src = `${IMG}?prompt=${encodeURIComponent(item.prompt)}&image_size=portrait_4_3`;
+    return `
+      <article class="card">
+        ${badges}
+        <img src="${src}" alt="${item.titulo}" loading="lazy" />
+        <div class="card-overlay">
+          <div class="play">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          </div>
+        </div>
+        <h3 class="card-title">${item.titulo}</h3>
+      </article>`;
+  }
+
+  document.getElementById('track-series').innerHTML = series.map(cardHTML).join('');
+  document.getElementById('track-filmes').innerHTML = filmes.map(cardHTML).join('');
+
+  // Navegação por setas (rola 3 cards por clique)
+  document.querySelectorAll('.arrow').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const track = btn.parentElement.querySelector('.carousel-track');
+      const card = track.querySelector('.card');
+      const amount = (card.offsetWidth + 16) * 3;
+      const dir = btn.classList.contains('next') ? 1 : -1;
+      track.scrollBy({ left: dir * amount, behavior: 'smooth' });
+    });
+  });
+
+  // ============================================================
+  // NAVBAR — fundo sólido ao rolar + menu hambúrguer
+  // ============================================================
+  const nav = document.getElementById('nav');
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+
+  // Fecha o menu ao clicar em um link (mobile)
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('open');
+    });
+  });
+
+  // ============================================================
+  // MÁQUINA DE ESTADOS DO FORMULÁRIO
+  // Estados: idle | loading | error | success
+  // ============================================================
+  const form = document.getElementById('signup-form');
+  const emailInput = document.getElementById('email');
+  const cta = document.getElementById('cta');
+  const feedback = document.getElementById('feedback');
+
+  let status = 'idle';
+  let redirectTimer = null;
+
+  function setStatus(novo) { status = novo; render(); }
+
+  function render() {
+    // Reset visual
+    emailInput.classList.remove('input-error');
+    cta.classList.remove('loading');
+    feedback.className = 'feedback';
+    feedback.innerHTML = '';
+
+    switch (status) {
+      case 'idle':
+        cta.disabled = false;
+        cta.innerHTML = '<span class="cta-text">Começar teste grátis</span>';
+        break;
+
+      case 'loading':
+        cta.disabled = true;
+        cta.classList.add('loading');
+        cta.innerHTML = '<span class="spinner"></span><span class="cta-text">Processando...</span>';
+        break;
+
+      case 'error':
+        cta.disabled = false;
+        cta.innerHTML = '<span class="cta-text">Começar teste grátis</span>';
+        emailInput.classList.add('input-error');
+        feedback.classList.add('error');
+        feedback.innerHTML = 'Email inválido';
+        break;
+
+      case 'success':
+        cta.disabled = false;
+        cta.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00FF88" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="cta-text" style="color:#00FF88">Conta criada</span>`;
+        feedback.classList.add('success');
+        feedback.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Conta criada! Redirecionando...`;
+        break;
+    }
+  }
+
+  const emailValido = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (status === 'loading') return;
+
+    const email = emailInput.value.trim();
+
+    // Validação → erro
+    if (!emailValido(email)) { setStatus('error'); return; }
+
+    // Envio → carregamento
+    setStatus('loading');
+
+    // Simula chamada assíncrona
+    setTimeout(() => {
+      setStatus('success');
+
+      // Redireciona em 2s e volta ao estado inicial
+      redirectTimer = setTimeout(() => {
+        document.getElementById('filmes').scrollIntoView({ behavior: 'smooth' });
+        setStatus('idle');
+      }, 2000);
+    }, 1400);
+  });
+
+  // Ao digitar, sai do erro
+  emailInput.addEventListener('input', () => {
+    if (status === 'error') setStatus('idle');
+  });
+
+  render();
+
+  // ============================================================
+  // REVELAÇÃO AO ROLAR (fade-in com IntersectionObserver)
+  // ============================================================
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
