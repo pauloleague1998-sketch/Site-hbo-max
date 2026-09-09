@@ -10,8 +10,8 @@
   }
 
   body {
-    /* Gradiente Deep Teal / Charcoal de fundo */
-    background: linear-gradient(180deg, #0e3b3b 0%, #0a1f1f 35%, #0a0a0a 100%);
+    /* Fundo cósmico azul-escuro */
+    background: radial-gradient(120% 80% at 50% 0%, #0c1536 0%, #060a1c 45%, #030510 100%);
     color: #ffffff;
     font-family: "Inter", system-ui, sans-serif;
     min-height: 100vh;
@@ -31,4 +31,19 @@
 @keyframes float {
   0%, 100% { translate: 0 0; }
   50%      { translate: 0 -10px; }
+}
+
+/* Raios de luz cósmicos emanando do carrossel central */
+@keyframes lightrays-spin {
+  to { transform: rotate(360deg); }
+}
+.light-rays {
+  background: repeating-conic-gradient(
+    from 0deg at 50% 42%,
+    rgba(120, 170, 255, 0.07) 0deg 5deg,
+    transparent 5deg 18deg
+  );
+  -webkit-mask-image: radial-gradient(58% 46% at 50% 42%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(58% 46% at 50% 42%, #000 0%, transparent 72%);
+  animation: lightrays-spin 90s linear infinite;
 }

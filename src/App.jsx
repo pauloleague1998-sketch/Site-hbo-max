@@ -49,7 +49,7 @@ const CAROUSEL = [
     sinopse:
       "Paul Atreides se une a Chani e aos Fremen em uma guerra de vingança contra os conspiradores que destruíram sua família.",
     img: IMG(
-      "Dune Part Two movie poster, two people in desert stillsuits, a man and a woman standing in sand dunes, epic sci-fi, orange sky, large title text DUNE PART TWO"
+      "Dune Part Two movie poster, sharp front-facing cover, Timothée Chalamet and Zendaya in desert stillsuits standing in sand dunes, epic sci-fi, orange sky, large title text 'DUNE: PART TWO', text 'CHALAMET / ZENDAYA' at bottom"
     ),
   },
   {
@@ -72,17 +72,6 @@ const CAROUSEL = [
       "No Oklahoma dos anos 1920, membros da tribo Osage são assassinados após descobrirem petróleo, e o FBI inicia uma investigação.",
     img: IMG(
       "Killers of the Flower Moon movie poster, serious man in early 1900s suit, muted sepia tones, dramatic portrait, visible title text"
-    ),
-  },
-  {
-    id: "interstellar",
-    title: "Interstellar",
-    ano: 2014,
-    rating: 4.5,
-    sinopse:
-      "Em um futuro onde a Terra está morrendo, um grupo de exploradores viaja por um buraco de minhoca em busca de um novo lar para a humanidade.",
-    img: IMG(
-      "Interstellar movie poster, astronaut standing before a massive black hole and star field, deep space, blue and amber light, visible title text"
     ),
   },
 ];
@@ -277,7 +266,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-[#0d3a3a] via-[#0a1f1f] to-[#0a0a0a]">
+    <div className="min-h-screen w-full bg-[radial-gradient(130%_90%_at_50%_0%,#0c1536_0%,#060a1c_45%,#030510_100%)]">
       {/* Cabeçalho / Navegação global */}
       <header className="flex items-center justify-between gap-6 px-10 py-6 lg:px-16">
         <a href="#" className="flex items-center gap-2.5">
@@ -326,9 +315,31 @@ export default function App() {
       </header>
 
       {/* ===== Hero: carrossel 3D de pôsteres ===== */}
-      <section className="relative overflow-hidden px-10 py-20 lg:px-16">
-        {/* Brilho azul/ciano de fundo (iluminação cinematográfica) */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.18),transparent_60%)]" />
+      <section className="relative overflow-hidden px-6 pt-14 pb-24 lg:px-16">
+        {/* Base cósmica azul-escura */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_0%,#0d1740_0%,#060a1c_45%,#030510_100%)]" />
+        {/* Raios de luz rotativos */}
+        <div className="light-rays pointer-events-none absolute inset-0" />
+        {/* Brilho central suave */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_42%_at_50%_38%,rgba(90,150,255,0.20),transparent_70%)]" />
+        {/* Linhas de dados horizontais */}
+        <div className="pointer-events-none absolute inset-x-0 top-1/3 h-px bg-gradient-to-r from-transparent via-cyan-200/25 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-2/3 h-px bg-gradient-to-r from-transparent via-indigo-200/15 to-transparent" />
+        {/* Piso reflexivo de vidro escuro */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-[linear-gradient(180deg,transparent_0%,rgba(12,20,44,0.6)_45%,rgba(3,5,16,0.96)_100%)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-100/40 to-transparent" />
+        {/* Reflexo espelhado do título central */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-8 select-none text-center text-6xl font-extrabold text-white/[0.08] blur-[2px]"
+          style={{ transform: "scaleY(-1)" }}
+        >
+          Dune: Part Two
+        </div>
+
+        {/* Trilho superior dos fios de sustentação */}
+        <div className="pointer-events-none absolute inset-x-0 top-10 flex justify-center">
+          <div className="h-px w-3/4 max-w-3xl bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+        </div>
 
         <div
           className="relative flex items-center justify-center"
@@ -338,21 +349,26 @@ export default function App() {
             const off = i - center;
             const abs = Math.abs(off);
 
-            // Pôster central claramente maior (~35% maior que os vizinhos).
+            // Pôster central claramente maior e de frente; os demais
+            // ficam angulados e levemente afastados (cover flow 3D).
             const scale = off === 0 ? 1.22 : 1 - abs * 0.115;
-            const rotateY = off * -12;
-            const translateZ = -abs * 55;
+            const rotateY = off * -14;
+            const translateZ = -abs * 60;
             const z = 20 - abs;
+
+            // Profundidade de campo: central nítido, laterais com leve
+            // desfoque e os dois extremos bem desfocados.
+            const blur = off === 0 ? 0 : abs === 1 ? 1.5 : 6;
 
             const sombra =
               off === 0
-                ? "shadow-[0_50px_100px_-12px_rgba(0,0,0,0.9)] ring-1 ring-cyan-300/25"
+                ? "shadow-[0_50px_100px_-12px_rgba(0,0,0,0.9)] ring-1 ring-white/20"
                 : "shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] ring-1 ring-white/10";
 
             return (
               <figure
                 key={m.id}
-                className="w-56 shrink-0"
+                className="relative w-56 shrink-0"
                 style={{
                   marginLeft: i === 0 ? 0 : "-1.5rem",
                   transform: `rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`,
@@ -360,16 +376,24 @@ export default function App() {
                   transformStyle: "preserve-3d",
                 }}
               >
-                <img
-                  src={m.img}
-                  alt={m.title}
-                  onClick={() => setSelecionado(m)}
-                  className={`aspect-[2/3] w-full cursor-pointer rounded-lg object-cover transition-all duration-300 ease-out hover:scale-110 hover:brightness-110 hover:shadow-[0_30px_80px_-15px_rgba(34,211,238,0.6)] ${sombra}`}
-                  style={{
-                    animation: "float 6s ease-in-out infinite",
-                    animationDelay: `${i * 0.35}s`,
-                  }}
-                />
+                {/* Fio de sustentação pendurado no trilho */}
+                <div className="absolute left-1/2 top-0 h-28 w-px -translate-x-1/2 -translate-y-full bg-gradient-to-b from-white/40 to-white/5" />
+
+                <div
+                  className={`overflow-hidden rounded-lg ${sombra}`}
+                  style={{ filter: `blur(${blur}px)` }}
+                >
+                  <img
+                    src={m.img}
+                    alt={m.title}
+                    onClick={() => setSelecionado(m)}
+                    className="aspect-[2/3] w-full cursor-pointer object-cover transition-all duration-300 ease-out hover:scale-110 hover:brightness-110"
+                    style={{
+                      animation: "float 6s ease-in-out infinite",
+                      animationDelay: `${i * 0.35}s`,
+                    }}
+                  />
+                </div>
               </figure>
             );
           })}
