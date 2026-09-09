@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FILMFLIX — Streaming</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     DESIGN SYSTEM — FILMFLIX
+     Modo escuro · gradiente deep teal/charcoal · acento ciano/azul
+  ============================================================ */
+  :root {
+    --bg-0: #0B1220;
+    --bg-1: #0D1B2A;
+    --teal: #0F2E33;
+    --cyan: #22D3EE;
+    --blue: #3B82F6;
+    --text-0: #FFFFFF;
+    --text-1: #B6C2D4;
+    --text-2: #6F7E94;
+    --border: rgba(255,255,255,0.08);
+    --accent: linear-gradient(135deg, #22D3EE 0%, #3B82F6 100%);
+    --radius: 16px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background:
+      radial-gradient(1100px 560px at 75% -10%, rgba(34,211,238,0.12), transparent 60%),
+      radial-gradient(1000px 520px at 15% 0%, rgba(59,130,246,0.10), transparent 55%),
+      linear-gradient(160deg, var(--bg-0) 0%, var(--bg-1) 42%, var(--teal) 100%);
+    color: var(--text-0);
+    line-height: 1.5;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  img { display: block; max-width: 100%; }
+
+  /* ===== Animações ===== */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+  }
+
+  .anim { animation: slideUp 0.7s var(--ease) both; }
+  .anim-fade { animation: fadeIn 0.6s var(--ease) both; }
+
+  /* ============================================================
+     NAVBAR
+  ============================================================ */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 4.5%;
+    background: rgba(11,18,32,0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    animation: slideDown 0.6s var(--ease) both;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text-0);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1.5px;
+    line-height: 1;
+  }
+  .logo svg { color: var(--cyan); filter: drop-shadow(0 0 8px rgba(34,211,238,0.6)); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-1);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 9px 15px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.25s, background 0.25s;
+  }
+  .nav-links a:hover { color: var(--text-0); }
+
+  /* Destaque visual em "New Releases" */
+  .nav-links a.hot {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-0);
+    background: linear-gradient(135deg, rgba(34,211,238,0.16), rgba(59,130,246,0.16));
+    border: 1px solid rgba(34,211,238,0.35);
+    box-shadow: 0 0 18px rgba(34,211,238,0.16);
+  }
+  .nav-links a.hot .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--text-1);
+    cursor: pointer;
+    transition: color 0.25s, background 0.25s;
+  }
+  .icon-btn:hover { color: var(--text-0); background: rgba(255,255,255,0.06); }
+
+  .profile {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    color: var(--text-0);
+  }
+  .profile .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(34,211,238,0.55);
+    box-shadow: 0 0 14px rgba(34,211,238,0.3);
+  }
+  .profile .name { font-size: 0.88rem; font-weight: 600; }
+  .profile svg { color: var(--text-2); }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #04121A;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 11px 24px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 8px 24px rgba(34,211,238,0.32);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s, filter 0.25s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow: 0 12px 30px rgba(34,211,238,0.45);
+  }
+
+  /* ============================================================
+     HERO — carrossel 3D de pôsteres
+  ============================================================ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 130px 4% 60px;
+    overflow: hidden;
+  }
+
+  /* Brilho de gradiente azul/ciano ao redor do carrossel */
+  .hero-glow {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 78%;
+    height: 66%;
+    background:
+      radial-gradient(ellipse at center, rgba(34,211,238,0.28), rgba(34,211,238,0.06) 45%, transparent 70%);
+    filter: blur(70px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-glow.blue {
+    background: radial-gradient(ellipse at center, rgba(59,130,246,0.22), transparent 65%);
+    width: 60%; height: 55%;
+  }
+
+  .hero-carousel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1240px;
+    height: 540px;
+  }
+  .stage {
+    position: absolute;
+    inset: 0;
+    perspective: 1300px;
+  }
+  .carousel {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 0; height: 0;
+    transform-style: preserve-3d;
+  }
+  .poster {
+    position: absolute;
+    left: 0; top: 0;
+    width: 200px;
+    aspect-ratio: 2 / 3;
+    transform: translate(-50%, -50%) translateX(var(--x)) translateZ(var(--z)) rotateY(var(--ry)) scale(var(--s));
+    transform-style: preserve-3d;
+  }
+  .poster-inner {
+    width: 100%; height: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 34px 70px rgba(0,0,0,0.6);
+    animation: float var(--ft, 7s) ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  .poster-inner img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  /* Brilho ciano sutil em cada pôster */
+  .poster-inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(34,211,238,0.14), transparent 45%);
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     SEÇÃO "RECOMMENDED FOR YOU"
+  ============================================================ */
+  .recommended {
+    position: relative;
+    z-index: 2;
+    padding: 40px 4.5% 90px;
+  }
+  .recommended h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3vw, 1.9rem);
+    letter-spacing: 0.5px;
+    margin-bottom: 26px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+  }
+
+  .rcard {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.35s var(--ease), box-shadow 0.35s, border-color 0.35s;
+  }
+  .rcard:hover {
+    transform: translateY(-8px);
+    border-color: rgba(34,211,238,0.45);
+    box-shadow: 0 24px 50px rgba(0,0,0,0.45), 0 0 30px rgba(34,211,238,0.14);
+  }
+
+  .rcard-media {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+  }
+  .rcard-media img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--ease);
+  }
+  .rcard:hover .rcard-media img { transform: scale(1.05); }
+
+  .rcard-body {
+    padding: 16px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .rcard-body h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rcard-desc {
+    color: var(--text-2);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .rcard-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .rcard-genres {
+    color: var(--text-1);
+    font-size: 0.72rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rcard-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #FFC24B;
+    white-space: nowrap;
+  }
+  .stars {
+    position: relative;
+    display: inline-block;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    color: #35465C;
+    line-height: 1;
+  }
+  .stars-fill {
+    position: absolute;
+    top: 0; left: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #FFC24B;
+  }
+
+  .rcard-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 3px;
+  }
+  .btn-play {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #04121A;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 10px 16px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(34,211,238,0.3);
+    transition: transform 0.25s var(--ease), filter 0.25s;
+  }
+  .btn-play:hover { transform: translateY(-2px); filter: brightness(1.06); }
+  .btn-add {
+    width: 42px; height: 42px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text-0);
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .btn-add:hover { background: rgba(34,211,238,0.15); border-color: rgba(34,211,238,0.45); }
+
+  /* ============================================================
+     RESPONSIVIDADE
+  ============================================================ */
+  @media (max-width: 1100px) {
+    .nav-links { display: none; }
+    .cards { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 860px) {
+    .hero-carousel { transform: scale(0.62); }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .profile .name, .profile svg { display: none; }
+  }
+  @media (max-width: 520px) {
+    .cards { grid-template-columns: 1fr; }
+    .hero-carousel { transform: scale(0.45); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="nav">
+    <a href="#" class="logo">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+        <rect x="2.5" y="2.5" width="19" height="19" rx="4"/>
+        <circle cx="12" cy="12" r="3.1"/>
+        <line x1="7" y1="2.5" x2="7" y2="6.2"/><line x1="12" y1="2.5" x2="12" y2="6.2"/><line x1="17" y1="2.5" x2="17" y2="6.2"/>
+        <line x1="7" y1="17.8" x2="7" y2="21.5"/><line x1="12" y1="17.8" x2="12" y2="21.5"/><line x1="17" y1="17.8" x2="17" y2="21.5"/>
+        <line x1="2.5" y1="7" x2="6.2" y2="7"/><line x1="2.5" y1="12" x2="6.2" y2="12"/><line x1="2.5" y1="17" x2="6.2" y2="17"/>
+        <line x1="17.8" y1="7" x2="21.5" y2="7"/><line x1="17.8" y1="12" x2="21.5" y2="12"/><line x1="17.8" y1="17" x2="21.5" y2="17"/>
+      </svg>
+      <span>FILMFLIX</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Movies</a></li>
+      <li><a href="#">TV Shows</a></li>
+      <li><a href="#" class="hot"><span class="dot"></span>New Releases</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="icon-btn" aria-label="Buscar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <div class="profile">
+        <img class="avatar" src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=professional%20headshot%20portrait%20of%20a%20smiling%20young%20woman%20with%20dark%20hair%2C%20soft%20studio%20lighting%2C%20neutral%20dark%20background%2C%20high%20quality&image_size=square" alt="Ana L." />
+        <span class="name">Ana L.</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <button class="btn-primary">Subscribe Now</button>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO — CARROSSEL 3D ===================== -->
+  <header class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow blue"></div>
+
+    <div class="hero-carousel">
+      <div class="stage">
+        <div class="carousel" id="carousel"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== RECOMMENDED FOR YOU ===================== -->
+  <section class="recommended">
+    <h2 class="anim">Recommended For You</h2>
+    <div class="cards" id="cards"></div>
+  </section>
+
+<script>
+  // ============================================================
+  // DADOS DOS FILMES
+  // ============================================================
+  const IMG = 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image';
+
+  const movies = [
+    {
+      title: 'Oppenheimer',
+      prompt: 'biographical drama film poster, silhouette of man in fedora hat against massive orange atomic fireball explosion, dark moody cinematic, teal and orange contrast',
+      genres: 'Drama · Biography · History',
+      rating: 4.6,
+      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.'
+    },
+    {
+      title: 'Poor Things',
+      prompt: 'surreal art film poster, victorian steampunk portrait of a woman with eccentric makeup, pastel teal pink and gold, whimsical baroque style',
+      genres: 'Comedy · Drama · Sci-Fi',
+      rating: 4.4,
+      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.'
+    },
+    {
+      title: 'Dune: Part Two',
+      prompt: 'epic science fiction film poster, lone figure on vast desert dune under two suns, giant sandworm silhouette, golden and deep teal cinematic',
+      genres: 'Sci-Fi · Adventure · Drama',
+      rating: 4.8,
+      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.'
+    },
+    {
+      title: 'Barbie',
+      prompt: 'vibrant comedy film poster, glamorous woman in pink retro fashion, pastel pink dreamy aesthetic, playful and bright',
+      genres: 'Comedy · Fantasy · Adventure',
+      rating: 4.3,
+      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.'
+    },
+    {
+      title: 'Killers of the Flower Moon',
+      prompt: 'historical crime drama film poster, 1920s oil fields at dusk, period figures in silhouette, dark moody cinematic, earthy tones',
+      genres: 'Crime · Drama · Western',
+      rating: 4.5,
+      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.'
+    },
+    {
+      title: 'Interstellar',
+      prompt: 'space science fiction film poster, astronaut floating before black hole and star field, deep space, epic cinematic',
+      genres: 'Sci-Fi · Drama · Adventure',
+      rating: 4.7,
+      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.'
+    }
+  ];
+
+  // ============================================================
+  // RENDERIZAÇÃO DO CARROSSEL 3D (Dune: Part Two ao centro)
+  // ============================================================
+  const heroOrder = [
+    { key: 'Oppenheimer',             x: -500, ry: 40,  z: -160, s: 0.70, d: 1.2, ft: 7.0 },
+    { key: 'Poor Things',             x: -270, ry: 22,  z: -40,  s: 0.86, d: 0.4, ft: 6.2 },
+    { key: 'Dune: Part Two',          x: 0,    ry: 0,   z: 70,   s: 1.12, d: 0.0, ft: 5.4 },
+    { key: 'Barbie',                  x: 270,  ry: -22, z: -40,  s: 0.86, d: 0.8, ft: 6.6 },
+    { key: 'Killers of the Flower Moon', x: 500, ry: -40, z: -160, s: 0.70, d: 1.6, ft: 7.4 },
+    { key: 'Interstellar',            x: 680,  ry: -55, z: -260, s: 0.56, d: 2.2, ft: 8.0 }
+  ];
+  const zIndexByPosition = [4, 5, 6, 5, 4, 3];
+
+  const carousel = document.getElementById('carousel');
+  carousel.innerHTML = heroOrder.map((p, i) => {
+    const m = movies.find(mm => mm.title === p.key);
+    const src = `${IMG}?prompt=${encodeURIComponent(m.prompt)}&image_size=portrait_4_3`;
+    return `
+      <div class="poster"
+           style="--x:${p.x}px; --ry:${p.ry}deg; --z:${p.z}px; --s:${p.s}; --d:${p.d}s; --ft:${p.ft}s; z-index:${zIndexByPosition[i]};">
+        <div class="poster-inner">
+          <img src="${src}" alt="${m.title}" loading="lazy" />
+        </div>
+      </div>`;
+  }).join('');
+
+  // ============================================================
+  // RENDERIZAÇÃO DOS CARDS (5 filmes)
+  // ============================================================
+  const cardList = ['Oppenheimer', 'Poor Things', 'Barbie', 'Killers of the Flower Moon', 'Interstellar'];
+
+  function starsHTML(rating) {
+    const pct = (rating / 5) * 100;
+    return `
+      <span class="stars">
+        <span class="stars-fill" style="width:${pct}%">★★★★★</span>
+        <span>★★★★★</span>
+      </span>`;
+  }
+
+  const cards = document.getElementById('cards');
+  cards.innerHTML = cardList.map(name => {
+    const m = movies.find(mm => mm.title === name);
+    const src = `${IMG}?prompt=${encodeURIComponent(m.prompt)}&image_size=portrait_4_3`;
+    return `
+      <article class="rcard">
+        <div class="rcard-media">
+          <img src="${src}" alt="${m.title}" loading="lazy" />
+        </div>
+        <div class="rcard-body">
+          <h3>${m.title}</h3>
+          <p class="rcard-desc">${m.desc}</p>
+          <div class="rcard-meta">
+            <span class="rcard-genres">${m.genres}</span>
+            <span class="rcard-rating">${starsHTML(m.rating)} ${m.rating.toFixed(1)}</span>
+          </div>
+          <div class="rcard-actions">
+            <button class="btn-play">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              Play
+            </button>
+            <button class="btn-add" aria-label="Adicionar à lista">+</button>
+          </div>
+        </div>
+      </article>`;
+  }).join('');
+</script>
+</body>
+</html>
